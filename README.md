@@ -3,12 +3,9 @@
 本项目为简化wordpress网站开发而制作
 
 ## 功能
-* css热加载不用刷新
-* js更新自动刷新
-* 开发中wordpress 指定目录下文件 修代码会自动重载
-
-## 待解决问题
-* //TODO 测试资源文件的配置于加载
+* css 热加载不用刷新
+* js 更新自动刷新
+* 开发中wordpress 指定目录工作下文件 修代码自动刷新
 
 
 ## 安装依赖
@@ -23,7 +20,7 @@ pnpm i
 
 配置 `VITE_WORDPRESS_ROOT` wordpress 目录
 
-配置 `VITE_WORDPRESS_ADD_WATCH_DIR` wordpress 的相对工作目录
+配置 `VITE_WORDPRESS_ADD_WATCH_DIR` wordpress 的相对工作目录(实际我们开发的主题或者插件的目录 一般是: `wp-content/[plugins|themes]/`)
 
 或者在 .env.production .env.development 中根据不同环境配置项目名称和目录
 
@@ -33,7 +30,7 @@ pnpm i
 //必须启动插件
 hp_enable_plugin();
 
-//根据页面的不同启用的模块
+//根据页面的不同启用不同的模块
 hp_enqueue_module('<这列写热加载或者部署的名称>'); //其中的名称使 src/modules 下的目录名称 例如: main,这种 main/hello 注意: 目录下必须有一个index.ts文件 没有不会进行加载
 //hp_enqueue_module('main', 'main/hello');
 ```
@@ -45,12 +42,12 @@ hp_enqueue_module('<这列写热加载或者部署的名称>'); //其中的名�
 define('MY_PLUGIN_CODE_MODE', 'production');
 ```
 
-## 启动
+## 开发启动
 ```
 pnpm dev
 ```
 
-## 打包
+## 打包会打包在工作目录的dist/目录下
 ```
 pnpm build
 ```

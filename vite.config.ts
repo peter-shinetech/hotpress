@@ -1,8 +1,11 @@
-import { defineConfig, loadEnv } from "vite";
+import { ConfigEnv, defineConfig, loadEnv } from "vite";
 import { MyPlugin } from "./plugins";
 import { join } from "node:path";
 import { readdirSync, statSync } from "node:fs";
-import { dir } from "node:console";
+import { fileURLToPath } from "node:url";
+
+const serverPort = process.env.PORT || 18500;
+
 
 function getAllFolders(dir, foldersList = []) {
   const files = readdirSync(dir);
@@ -19,7 +22,7 @@ function getAllFolders(dir, foldersList = []) {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }: ConfigEnv) => {
   const allEnv = { ...process.env, ...loadEnv(mode, process.cwd()) };
   const {
     VITE_WORDPRESS_ROOT,
@@ -53,11 +56,29 @@ export default defineConfig(({ mode }) => {
         projectName: VITE_PROJECT_NAME,
       }),
     ],
-
+    base:'./',
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src',
+          import.meta.url))
+      }
+    },
     server: {
       cors: true,
-      port: 18500,
+      port: serverPort,
       host: "0.0.0.0",
+      origin: `http://localhost:${serverPort}`,
+      watch: {
+        ignored: [
+          "**/.vite/**", 
+          '**/vendor/**', 
+        ],
+        ignoreInitial: true,
+        ignorePermissionErrors: true,
+      },
+      // fs: {
+        // allow:{}
+      // }
     },
 
     build: {

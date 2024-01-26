@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path, { join } from "node:path";
+import path, { join, relative } from "node:path";
 import { watch } from "chokidar";
 
 interface WordpressConfig {
@@ -11,7 +11,10 @@ interface WordpressConfig {
 
 /**
  * Write mu-plugins file
- * @param wordpressRootDir
+ * @param wordpressRootDir wordpress absolute root path
+ * @param watchDir wordpress watch path work dir
+ * @param serverHost vite dev server host
+ * @param name project name
  */
 const writeMuPluginsFile = (
   wordpressRootDir: string,
@@ -53,19 +56,25 @@ const MyPlugin = (myConf: WordpressConfig) => {
   // reload js
   // reload php
 
-  const configureServer = ({ config, ws }) => {
-    const logger = config.logger;
-    const serverHost = `http://localhost:${config.server.port}`;
+  const configureServer = (serverConfig) => {
+    const { config, ws, watcher } = serverConfig;
+    const {
+      logger,
+      server: { origin },
+    } = config;
     writeMuPluginsFile(
       myConf.rootDir,
       myConf.watchDir,
-      serverHost,
+      origin,
       myConf.projectName
     );
 
     const reload = (path: string) => {
       ws.send({ type: "full-reload", path: "*" });
-      logger.info(`wordpress reloaded: ${path}`, { clear: true, timestamp: true });
+      logger.info(`wordpress reloaded: ${path}`, {
+        clear: true,
+        timestamp: true,
+      });
     };
 
     const cwd = join(myConf.rootDir, myConf.watchDir);
@@ -78,7 +87,7 @@ const MyPlugin = (myConf: WordpressConfig) => {
       //   pollInterval: 500,
       // },
     };
-    watch(join(cwd, "**/*"), {
+    const watcher2 = watch(join(cwd, "**/*"), {
       cwd,
       ...defaultWatchOptions,
       ...(myConf?.watchOptions ?? {}),
