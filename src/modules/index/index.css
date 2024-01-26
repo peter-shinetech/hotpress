@@ -1,5 +1,5 @@
+@import '../common/index.css';
 body {
     color: white;
     font-size: 12px;
-    background-color: green !important;
 }
